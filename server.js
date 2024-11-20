@@ -1,7 +1,8 @@
 import express from "express"
 
 import connectDB from "./source/config/db.js"
-import Media from "./source/model/media.model.js"
+
+import { getData, createData, deleteData } from "./source/controller/method.controller.js";
 
 const app = express();
 
@@ -9,27 +10,11 @@ app.use(express.json());
 
 
 
-app.get('/api/data', async (req, res) => {
-    const data = await Media.find();
-    res.json(data);
-})
+app.get('/api/data', getData)
 
-app.post('/api/data', async (req, res) => {
-    const mediaRequest = req.body;
-    const media = new Media(mediaRequest);
-    media.save();
-    res.status(200).json({ 'success': 'true', 'data': mediaRequest});
-})
+app.post('/api/data', createData)
 
-app.delete('/api/data/:id', async (req, res) => {
-    const {id} = req.params;
-    try {
-        await Media.findByIdAndDelete(id);
-        return res.status(200).json({"success": "true", "deleted": "true"})
-    } catch (error) {
-        console.error('could not delete data', error.message)
-    }
-})
+app.delete('/api/data/:id', deleteData)
 
 connectDB().then(() => {
     app.listen(process.env.PORT || 5000, () => {
